@@ -29,15 +29,36 @@
         android:layout_height="0dp"
         android:layout_weight="0.25">
 
-        <android.support.v7.widget.AppCompatButton
-            android:id="@+id/button"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/get_quote_button_text"
-            android:textAllCaps="false"
-            android:textSize="18sp"
-            android:layout_margin="16dp"
-            android:layout_gravity="center"/>
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center">
+
+            <android.support.v7.widget.AppCompatButton
+                android:id="@+id/button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/get_quote_button_text"
+                android:textAllCaps="false"
+                android:textSize="18sp"
+                android:textColor="@android:color/white"
+                android:background="@android:color/black"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"/>
+
+            <android.support.v7.widget.AppCompatButton
+                android:id="@+id/navigate_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/go_to_collection_button_text"
+                android:textAllCaps="false"
+                android:textSize="18sp"
+                android:textColor="@android:color/black"
+                android:background="@android:color/transparent"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"/>
+        </LinearLayout>
     </FrameLayout>
 
 </LinearLayout>

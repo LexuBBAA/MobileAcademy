@@ -2,6 +2,8 @@
     <string name="app_name">MobileAcademy2</string>
     <string name="random_quote_text">Your random quote:\n%s</string>
     <string name="get_quote_button_text">Get Random Quote</string>
+    <string name="go_to_collection_button_text">Go to Quotes Collection</string>
+    <string name="loading_quotes_text">Loading quotes...\nPlease wait</string>
     <string-array name="quotes">
         <item></item>
         <item></item>

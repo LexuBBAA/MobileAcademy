@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.lexu.mobileacademy2.QuoteDetailsActivity">
+
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/quote_id_output_text_view"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="ID: 1299"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:layout_marginTop="24dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"/>
+
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/quote_content_output_text_view"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:text="\'Content: Lorem ipsum si ceva...\'"
+        android:textSize="18sp"
+        android:textStyle="italic"
+        android:ellipsize="end"
+        android:textColor="@android:color/black"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
+        android:layout_below="@+id/quote_id_output_text_view"
+        android:layout_above="@+id/quote_url_output_text_view"
+        android:layout_alignStart="@+id/quote_id_output_text_view"
+        android:layout_alignEnd="@+id/quote_id_output_text_view"/>
+
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/quote_url_output_text_view"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="URL: https://ceva.com"
+        android:textSize="17sp"
+        android:textColor="@android:color/holo_blue_dark"
+        android:gravity="end"
+        android:layout_marginBottom="16dp"
+        android:layout_above="@+id/quote_title_output_text_view"
+        android:layout_alignStart="@+id/quote_content_output_text_view"
+        android:layout_alignEnd="@+id/quote_content_output_text_view"/>
+
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/quote_title_output_text_view"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="- 1299"
+        android:textSize="30sp"
+        android:textStyle="bold|italic"
+        android:gravity="end"
+        android:layout_marginBottom="24dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignStart="@+id/quote_url_output_text_view"
+        android:layout_alignEnd="@+id/quote_url_output_text_view"/>
+</RelativeLayout>

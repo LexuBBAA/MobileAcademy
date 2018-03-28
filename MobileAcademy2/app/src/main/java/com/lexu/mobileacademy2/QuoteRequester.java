@@ -9,6 +9,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.io.Serializable;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -24,7 +25,7 @@ import static com.lexu.mobileacademy2.QuoteRequester.StatusCodes.SUCCESS;
  * Created by lexu on 28.03.2018.
  */
 
-public class QuoteRequester {
+class QuoteRequester {
 
     public interface StatusCodes {
         int SUCCESS = 200;
@@ -34,13 +35,14 @@ public class QuoteRequester {
     }
 
     private static final String API = "http://quotesondesign.com/wp-json/posts?filter[orderby]=rand&filter[posts_per_page]=1";
+    private static final String API_MULTIPLE = "http://quotesondesign.com/wp-json/posts?filter[orderby]=rand&filter[posts_per_page]=20";
 
     private OkHttpClient mClient = new OkHttpClient();
 
-    public QuoteRequester() {
+    QuoteRequester() {
     }
 
-    public void getQuote(final OnQuoteEventHandler handler) {
+    void getQuote(final OnQuoteEventHandler handler) {
         mClient.newCall(new Request.Builder().url(API).build()).enqueue(new Callback() {
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
@@ -61,6 +63,36 @@ public class QuoteRequester {
                 switch (code) {
                     case SUCCESS:
                         build(body.string(), code, msg, handler);
+                        break;
+
+                    default:
+                        fail(code, msg, handler);
+                }
+            }
+        });
+    }
+
+    void getQuotes(final OnQuoteEventHandler handler) {
+        mClient.newCall(new Request.Builder().url(API_MULTIPLE).build()).enqueue(new Callback() {
+            @Override
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
+                OnQuoteEventHandler.ResponseData<IOException> result = new OnQuoteEventHandler.ResponseData<IOException>();
+                result.setCode(BAD_REQUEST);
+                result.setData(e);
+                result.setMsg(e.getLocalizedMessage());
+
+                handler.onFailure(result);
+            }
+
+            @Override
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                ResponseBody body = response.body();
+                int code = response.code();
+                String msg = response.message();
+
+                switch (code) {
+                    case SUCCESS:
+                        buildMultiple(body.string(), code, msg, handler);
                         break;
 
                     default:
@@ -91,6 +123,22 @@ public class QuoteRequester {
         handler.onSuccess(responseData);
     }
 
+    private void buildMultiple(String string, int code, String msg, final OnQuoteEventHandler handler) {
+        QuoteParserMultiple parser = new QuoteParserMultiple(string, new QuoteParserMultiple.OnQuoteParsedListener() {
+            @Override
+            public void onQuoteParsed(Quote newQuote) {
+                OnQuoteEventHandler.ResponseData<Quote> responseData = new OnQuoteEventHandler.ResponseData<Quote>();
+                responseData.setCode(SUCCESS);
+                responseData.setMsg("SUCCESS");
+                responseData.setData(newQuote);
+
+                handler.onSuccess(responseData);
+            }
+        });
+
+        parser.doInBackground();
+    }
+
     private void fail(int code, String msg, OnQuoteEventHandler handler) {
         OnQuoteEventHandler.ResponseData<Void> responseData = new OnQuoteEventHandler.ResponseData<Void>();
         responseData.setMsg(msg);
@@ -98,6 +146,38 @@ public class QuoteRequester {
         responseData.setData(null);
 
         handler.onSuccess(responseData);
+    }
+}
+
+class QuoteParserMultiple extends  AsyncTask<Void, Quote, Void> {
+
+    private String jsonData = null;
+    private OnQuoteParsedListener mOnQuoteParsedListener = null;
+
+    public QuoteParserMultiple(@Nullable String jsonData, OnQuoteParsedListener listener) {
+        this.jsonData = jsonData;
+        mOnQuoteParsedListener = listener;
+    }
+
+    @Override
+    protected Void doInBackground(Void... voids) {
+        JSONArray jsonArray = null;
+        try {
+            jsonArray = new JSONArray(this.jsonData);
+            for(int i = 0; i < jsonArray.length(); i++) {
+                JSONObject jsonQuote = jsonArray.getJSONObject(i);
+                Quote newQuote = Quote.parseFromJson(jsonQuote);
+                mOnQuoteParsedListener.onQuoteParsed(newQuote);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    interface OnQuoteParsedListener {
+        void onQuoteParsed(Quote newQuote);
     }
 }
 
@@ -164,7 +244,7 @@ interface OnQuoteEventHandler {
     void onFailure(ResponseData responseData);
 }
 
-class Quote {
+class Quote implements Serializable {
     interface QuoteUtils {
         String FIELD_ID = "ID";
         String FIELD_TITLE = "title";
