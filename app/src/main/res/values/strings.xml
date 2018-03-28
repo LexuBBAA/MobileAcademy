@@ -1,5 +1,0 @@
-<resources>
-    <string name="app_name">MobileAcademy1</string>
-    <string name="nameDestinationTemplate">Hi, %s!</string>
-    <string name="nameErrorTemplate">Please provide a valid name</string>
-</resources>
