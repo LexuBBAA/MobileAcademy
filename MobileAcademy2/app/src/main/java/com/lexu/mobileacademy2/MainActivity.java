@@ -1,0 +1,96 @@
+package com.lexu.mobileacademy2;
+
+import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.AppCompatButton;
+import android.text.Html;
+import android.view.View;
+import android.widget.Toast;
+
+import com.lexu.mobileacademy2.views.CustomTextView;
+
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, OnQuoteEventHandler {
+
+    private static final String TAG = MainActivity.class.getSimpleName();
+
+    private static String PLACEHOLDER;
+    private QuoteRequester mQuoteRequester = new QuoteRequester();
+
+    private CustomTextView quoteDestinationTextView = null;
+    private AppCompatButton button = null;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        this.quoteDestinationTextView = (CustomTextView) findViewById(R.id.quote_destination_text_view);
+        this.button = (AppCompatButton) findViewById(R.id.button);
+        this.button.setOnClickListener(MainActivity.this);
+
+        PLACEHOLDER = this.getResources().getString(R.string.random_quote_text);
+
+        this.quoteDestinationTextView.setText("Click the button to generate a new Quote!");
+    }
+
+    @Override
+    public void onClick(View v) {
+        MainActivity.this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                MainActivity.this.disableButton();
+            }
+        });
+
+        mQuoteRequester.getQuote(MainActivity.this);
+    }
+
+    @Override
+    public void onSuccess(ResponseData response) {
+        switch (response.getCode()) {
+            case QuoteRequester.StatusCodes.SUCCESS:
+                updateView(response);
+                break;
+            default:
+                showErrors(response);
+        }
+    }
+
+    @Override
+    public void onFailure(ResponseData responseData) {
+        showErrors(responseData);
+    }
+
+    private void disableButton() {
+        MainActivity.this.button.setClickable(false);
+        MainActivity.this.button.setFocusable(false);
+    }
+
+    private void enableButton() {
+        MainActivity.this.button.setClickable(true);
+        MainActivity.this.button.setFocusable(true);
+    }
+
+    private void showErrors(final ResponseData data) {
+        MainActivity.this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(MainActivity.this, data.getMsg(), Toast.LENGTH_LONG).show();
+                MainActivity.this.enableButton();
+            }
+        });
+    }
+
+    private void updateView(final ResponseData data) {
+        if(data.getData() instanceof Quote) {
+            final Quote quote = (Quote) data.getData();
+            MainActivity.this.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    MainActivity.this.quoteDestinationTextView.setText(String.format(PLACEHOLDER, Html.fromHtml(quote.getContent())), quote.getTitle());
+                    MainActivity.this.enableButton();
+                }
+            });
+        }
+    }
+}

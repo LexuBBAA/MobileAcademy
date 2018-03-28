@@ -1,0 +1,30 @@
+<resources>
+    <string name="app_name">MobileAcademy2</string>
+    <string name="random_quote_text">Your random quote:\n%s</string>
+    <string name="get_quote_button_text">Get Random Quote</string>
+    <string-array name="quotes">
+        <item></item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item></item>
+    </string-array>
+</resources>
