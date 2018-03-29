@@ -9,12 +9,17 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatTextView;
 import android.support.v7.widget.ListViewCompat;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.GridView;
 import android.widget.Toast;
 
+import com.lexu.mobileacademy2.views.CustomGridItemTextView;
+import com.lexu.mobileacademy2.views.CustomListItemTextView;
 import com.lexu.mobileacademy2.views.CustomTextView;
 
 import java.util.ArrayList;
@@ -24,12 +29,14 @@ import static com.lexu.mobileacademy2.QuoteRequester.StatusCodes.SUCCESS;
 public class QuotesActivity extends AppCompatActivity implements OnQuoteEventHandler {
 
     private static final String TAG = QuotesActivity.class.getSimpleName();
+
     public static final String QUOTE_KEY = "quote";
     private static final String QUOTE_COUNT = "quote_count";
 
     private QuoteRequester mQuoteRequester = new QuoteRequester();
 
     private ListViewCompat quotesListView = null;
+    private GridView quotesGridView = null;
     private AppCompatTextView messageTextView = null;
     private Adapter listAdapter = null;
 
@@ -44,20 +51,61 @@ public class QuotesActivity extends AppCompatActivity implements OnQuoteEventHan
         }
 
         this.quotesListView = (ListViewCompat) findViewById(R.id.quotes_list_view);
+        this.quotesGridView = (GridView) findViewById(R.id.quotes_grid_view);
         this.messageTextView = (AppCompatTextView) findViewById(R.id.message_container_text_view);
         this.listAdapter = new Adapter(QuotesActivity.this);
-        this.quotesListView.setAdapter(this.listAdapter);
-        this.quotesListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+        AdapterView.OnItemClickListener listener = new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Quote quote = (Quote) QuotesActivity.this.listAdapter.getItem(position);
                 QuotesActivity.this.navigate(quote);
             }
-        });
+        };
+
+        this.quotesListView.setAdapter(this.listAdapter);
+        this.quotesListView.setOnItemClickListener(listener);
+        this.quotesGridView.setAdapter(this.listAdapter);
+        this.quotesGridView.setOnItemClickListener(listener);
 
         if(this.listAdapter.getCount() == 0) {
             mQuoteRequester.getQuotes(QuotesActivity.this);
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.layout_menu, menu);
+
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.toggle_layout:
+                QuotesActivity.this.toggleLayout(item);
+                return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void toggleLayout(final MenuItem item) {
+        QuotesActivity.this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if(QuotesActivity.this.quotesListView.getVisibility() == View.VISIBLE) {
+                    QuotesActivity.this.quotesListView.setVisibility(View.GONE);
+                    QuotesActivity.this.quotesGridView.setVisibility(View.VISIBLE);
+                    item.setIcon(R.drawable.ic_view_list_black_24dp);
+                } else {
+                    QuotesActivity.this.quotesListView.setVisibility(View.VISIBLE);
+                    QuotesActivity.this.quotesGridView.setVisibility(View.GONE);
+                    item.setIcon(R.drawable.ic_apps_black_24dp);
+                }
+            }
+        });
     }
 
     @Override
@@ -122,6 +170,7 @@ public class QuotesActivity extends AppCompatActivity implements OnQuoteEventHan
                 public void run() {
                     if(QuotesActivity.this.messageTextView.getVisibility() == View.VISIBLE) {
                         QuotesActivity.this.messageTextView.setVisibility(View.GONE);
+                        QuotesActivity.this.quotesListView.setVisibility(View.VISIBLE);
                     }
 
                     QuotesActivity.this.listAdapter.addQuote(newQuote);
@@ -157,7 +206,11 @@ class Adapter extends ArrayAdapter<Quote> {
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
         if(convertView == null) {
-            convertView = new CustomTextView(getContext());
+            if(parent instanceof ListViewCompat) {
+                convertView = new CustomListItemTextView(getContext());
+            } else {
+                convertView = new CustomGridItemTextView(getContext());
+            }
         }
 
         Quote item = this.data.get(position);

@@ -8,7 +8,7 @@ import android.text.Html;
 import android.view.View;
 import android.widget.Toast;
 
-import com.lexu.mobileacademy2.views.CustomTextView;
+import com.lexu.mobileacademy2.views.CustomListItemTextView;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, OnQuoteEventHandler {
 
@@ -17,7 +17,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private static String PLACEHOLDER;
     private QuoteRequester mQuoteRequester = new QuoteRequester();
 
-    private CustomTextView quoteDestinationTextView = null;
+    private CustomListItemTextView quoteDestinationTextView = null;
     private AppCompatButton button = null;
     private AppCompatButton navigateButton = null;
 
@@ -26,7 +26,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        this.quoteDestinationTextView = (CustomTextView) findViewById(R.id.quote_destination_text_view);
+        this.quoteDestinationTextView = (CustomListItemTextView) findViewById(R.id.quote_destination_text_view);
         this.button = (AppCompatButton) findViewById(R.id.button);
         this.navigateButton = (AppCompatButton) findViewById(R.id.navigate_button);
         this.button.setOnClickListener(MainActivity.this);

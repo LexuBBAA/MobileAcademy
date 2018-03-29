@@ -13,7 +13,7 @@
         android:layout_height="0dp"
         android:layout_weight="0.75">
 
-        <com.lexu.mobileacademy2.views.CustomTextView
+        <com.lexu.mobileacademy2.views.CustomListItemTextView
             android:id="@+id/quote_destination_text_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
