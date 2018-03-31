@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">MobileAcademy3</string>
+    <string name="placeholder_date_text">MMM-dd</string>
+    <string name="placeholder_title_text">Title placeholder</string>
+    <string name="refresh_menu_item_text">Refresh</string>
+</resources>
