@@ -20,7 +20,8 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1">
+        android:layout_weight="1"
+        android:paddingBottom="16dp">
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -28,13 +29,16 @@
 
             <android.support.v7.widget.AppCompatImageView
                 android:id="@+id/article_image_view"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentStart="true"
                 android:layout_alignParentTop="true"
                 android:minHeight="200dp"
-                app:srcCompat="@drawable/ic_image_black_24dp"/>
+                android:maxHeight="350dp"
+                android:scaleType="fitCenter"
+                android:adjustViewBounds="true"
+                app:srcCompat="@drawable/ic_image_gray_24dp"/>
 
             <android.support.v7.widget.AppCompatTextView
                 android:id="@+id/article_title_view"
@@ -47,7 +51,7 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="8dp"
                 android:ellipsize="end"
-                android:lines="2"
+                android:lines="3"
                 android:text="@string/placeholder_title_text"
                 android:textColor="@android:color/black"
                 android:textSize="24sp"
@@ -65,12 +69,24 @@
                 android:textColor="@android:color/black"
                 android:textSize="18sp"/>
 
+            <android.support.v7.widget.AppCompatTextView
+                android:id="@+id/article_url_view"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:textSize="18sp"
+                android:layout_below="@+id/article_description_view"
+                android:layout_alignStart="@+id/article_description_view"
+                android:layout_alignEnd="@+id/article_description_view"
+                android:layout_marginTop="16dp"
+                android:text="@string/placeholder_title_text"
+                android:textColor="@android:color/holo_blue_dark"/>
+
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_alignEnd="@+id/article_description_view"
-                android:layout_alignStart="@+id/article_description_view"
-                android:layout_below="@+id/article_description_view"
+                android:layout_alignEnd="@+id/article_url_view"
+                android:layout_alignStart="@+id/article_url_view"
+                android:layout_below="@+id/article_url_view"
                 android:layout_marginTop="32dp"
                 android:orientation="horizontal"
                 android:weightSum="2">
@@ -85,7 +101,7 @@
                     android:text="@string/placeholder_title_text"
                     android:textColor="@android:color/black"
                     android:textSize="18sp"
-                    android:textStyle="bold"/>
+                    android:textStyle="bold|italic"/>
 
                 <android.support.v7.widget.AppCompatTextView
                     android:id="@+id/article_date_view"
@@ -98,7 +114,7 @@
                     android:text="@string/placeholder_title_text"
                     android:textColor="@android:color/darker_gray"
                     android:textSize="18sp"
-                    android:textStyle="bold"/>
+                    android:textStyle="bold|italic"/>
             </LinearLayout>
         </RelativeLayout>
     </ScrollView>

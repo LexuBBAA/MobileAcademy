@@ -1,9 +1,11 @@
 package com.lexu.mobileacademy3;
 
 import android.app.Activity;
+import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -15,6 +17,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatImageView;
 import android.support.v7.widget.AppCompatTextView;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -24,6 +27,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 
@@ -85,16 +90,60 @@ public class MainActivity extends AppCompatActivity implements ServiceUtils.Serv
 
         setupDrawer();
 
+        setupUI();
+
+        if(savedInstanceState != null && savedInstanceState.containsKey(CustomService.ARTICLES_EXTRA)) {
+            ServiceUtils.ArticlesWrapper wrapper = (ServiceUtils.ArticlesWrapper) savedInstanceState.getSerializable(CustomService.ARTICLES_EXTRA);
+            if(wrapper != null) {
+                this.adapter.setItems(wrapper.articles);
+            }
+            progressBarOverlay.setVisibility(View.GONE);
+        } else {
+            startCustomService();
+        }
+    }
+
+    private void setupDrawer() {
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        mNavigationView = (NavigationView) findViewById(R.id.navigation_view);
+        mNavigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                return false;
+            }
+        });
+
+        ActionBarDrawerToggle drawerToggle = new ActionBarDrawerToggle(MainActivity.this, mDrawerLayout, 0, 0) {
+            @Override
+            public void onDrawerOpened(View drawerView) {
+                super.onDrawerOpened(drawerView);
+            }
+
+            @Override
+            public void onDrawerClosed(View drawerView) {
+                super.onDrawerClosed(drawerView);
+            }
+        };
+
+        drawerToggle.setDrawerIndicatorEnabled(true);
+        mDrawerLayout.addDrawerListener(drawerToggle);
+        drawerToggle.syncState();
+    }
+
+    private void setupUI() {
         progressBarOverlay = (FrameLayout) findViewById(R.id.progress_bar_container);
         progressBar = (ProgressBar) findViewById(R.id.progress_bar);
 
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
-        RecyclerView.LayoutManager layoutManager = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
+        RecyclerView.LayoutManager layoutManager = null;
+        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+            layoutManager = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
+        } else {
+            layoutManager = new StaggeredGridLayoutManager(3, StaggeredGridLayoutManager.VERTICAL);
+        }
         recyclerView.setLayoutManager(layoutManager);
         adapter = new Adapter(this);
         recyclerView.setAdapter(adapter);
-
-        startCustomService();
     }
 
     private void startCustomService() {
@@ -133,36 +182,46 @@ public class MainActivity extends AppCompatActivity implements ServiceUtils.Serv
         startService(newIntent);
     }
 
-    private void setupDrawer() {
-        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        mNavigationView = (NavigationView) findViewById(R.id.navigation_view);
-        mNavigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                return false;
-            }
-        });
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        ServiceUtils.ArticlesWrapper wrapper = new ServiceUtils.ArticlesWrapper();
+        wrapper.articles = this.adapter.getItems();
 
-        ActionBarDrawerToggle drawerToggle = new ActionBarDrawerToggle(MainActivity.this, mDrawerLayout, 0, 0) {
-            @Override
-            public void onDrawerOpened(View drawerView) {
-                super.onDrawerOpened(drawerView);
-            }
-
-            @Override
-            public void onDrawerClosed(View drawerView) {
-                super.onDrawerClosed(drawerView);
-            }
-        };
-
-        drawerToggle.setDrawerIndicatorEnabled(true);
-        mDrawerLayout.addDrawerListener(drawerToggle);
-        drawerToggle.syncState();
+        outState.putSerializable(CustomService.ARTICLES_EXTRA, wrapper);
+        super.onSaveInstanceState(outState);
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main_activity, menu);
+
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        SearchView searchView = (SearchView) menu.findItem(R.id.menu_search).getActionView();
+        searchView.setSearchableInfo(searchManager != null ? searchManager.getSearchableInfo(getComponentName()) : null);
+        searchView.setIconifiedByDefault(true);
+        searchView.setQueryHint(getResources().getString(R.string.search_icon_text));
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                MainActivity.this.adapter.getFilter().filter(query);
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                MainActivity.this.adapter.getFilter().filter(newText);
+                return false;
+            }
+        });
+
+        searchView.setOnCloseListener(new SearchView.OnCloseListener() {
+            @Override
+            public boolean onClose() {
+                MainActivity.this.adapter.getFilter().filter("");
+                return false;
+            }
+        });
+
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -255,17 +314,28 @@ public class MainActivity extends AppCompatActivity implements ServiceUtils.Serv
             }
         });
     }
+
+    @Override
+    public void onBackPressed() {
+        if (mDrawerLayout.isDrawerOpen(Gravity.START)) {
+            mDrawerLayout.closeDrawer(Gravity.START);
+        } else {
+            super.onBackPressed();
+        }
+    }
 }
 
-class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
+class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> implements Filterable {
 
     private Context context = null;
     private OnNavigationOccurredListener callback = null;
     private List<NewsArticle> data = null;
+    private List<NewsArticle> displayedData = null;
 
     Adapter(Context context) {
         this.context = context;
         this.data = new ArrayList<NewsArticle>();
+        this.displayedData = new ArrayList<NewsArticle>();
         if(context instanceof OnNavigationOccurredListener) {
             this.callback = (OnNavigationOccurredListener) context;
         }
@@ -279,12 +349,15 @@ class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
 
     @Override
     public void onBindViewHolder(final Adapter.ViewHolder holder, int position) {
-        final NewsArticle article = this.data.get(position);
+        final NewsArticle article = this.displayedData.get(position);
 
-        Picasso.get()
-                .load(article.getImageSrc())
-                .placeholder(R.drawable.ic_image_black_24dp)
-                .into(holder.image);
+        if(!article.getImageSrc().isEmpty()) {
+            Picasso.get()
+                    .load(article.getImageSrc())
+                    .placeholder(R.drawable.ic_image_gray_24dp)
+                    .error(R.drawable.ic_broken_image_gray_24dp)
+                    .into(holder.image);
+        }
 
         holder.title.setText(article.getTitle() != null ? article.getTitle() : article.getDescription());
         holder.date.setText(article.getDate());
@@ -306,14 +379,51 @@ class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
 
     @Override
     public int getItemCount() {
-        return this.data == null ? 0 : this.data.size();
+        return this.displayedData == null ? 0 : this.displayedData.size();
     }
 
     public void addItems(List<NewsArticle> articles) {
         for (NewsArticle article : articles) {
             this.data.add(0, article);
+            this.displayedData.add(0, article);
             this.notifyItemInserted(0);
         }
+    }
+
+    List<NewsArticle> getItems() {
+        return this.data;
+    }
+
+    void setItems(List<NewsArticle> items) {
+        this.data = items;
+        this.displayedData = items;
+        this.notifyDataSetChanged();
+    }
+
+    @Override
+    public Filter getFilter() {
+        return new Filter() {
+            @Override
+            protected FilterResults performFiltering(CharSequence constraint) {
+                List<NewsArticle> filteredList = new ArrayList<NewsArticle>();
+                for(NewsArticle article: Adapter.this.data) {
+                    if(article.getTitle().toLowerCase().contains(constraint.toString().toLowerCase())) {
+                        filteredList.add(article);
+                    }
+                }
+
+                FilterResults filterResults = new FilterResults();
+                filterResults.values = filteredList;
+
+                return filterResults;
+            }
+
+            @Override
+            protected void publishResults(CharSequence constraint, FilterResults results) {
+                Adapter.this.displayedData = (List<NewsArticle>) results.values;
+                Adapter.this.notifyDataSetChanged();
+            }
+        };
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {

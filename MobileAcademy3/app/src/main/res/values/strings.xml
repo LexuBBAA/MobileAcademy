@@ -3,4 +3,6 @@
     <string name="placeholder_date_text">MMM-dd</string>
     <string name="placeholder_title_text">Title placeholder</string>
     <string name="refresh_menu_item_text">Refresh</string>
+    <string name="go_to_full_article_text">Read the full article here.</string>
+    <string name="search_icon_text">Search articles</string>
 </resources>
