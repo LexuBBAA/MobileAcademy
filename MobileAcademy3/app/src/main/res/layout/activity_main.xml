@@ -22,14 +22,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-
-        <android.support.design.widget.NavigationView
-            android:id="@+id/navigation_view"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_gravity="start"
-            android:minWidth="200dp"/>
-
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -75,5 +67,13 @@
 
         </RelativeLayout>
 
+        <android.support.design.widget.NavigationView
+            android:id="@+id/navigation_view"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="start"
+            android:minWidth="200dp"
+            android:fitsSystemWindows="true"
+            app:menu="@menu/menu_left_drawer"/>
     </android.support.v4.widget.DrawerLayout>
 </LinearLayout>

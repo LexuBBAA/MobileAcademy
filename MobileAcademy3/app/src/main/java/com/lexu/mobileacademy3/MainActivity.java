@@ -31,6 +31,7 @@ import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.FrameLayout;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.lexu.mobileacademy3.services.CustomService;
 import com.lexu.mobileacademy3.services.ServiceReceiver;
@@ -46,6 +47,7 @@ public class MainActivity extends AppCompatActivity implements ServiceUtils.Serv
     private ServiceReceiver receiver = null;
 
     private DrawerLayout mDrawerLayout = null;
+    private ActionBarDrawerToggle drawerToggle = null;
     private NavigationView mNavigationView = null;
     private RecyclerView recyclerView = null;
 
@@ -109,11 +111,25 @@ public class MainActivity extends AppCompatActivity implements ServiceUtils.Serv
         mNavigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.go_to_main:
+                        toastOnUIThread("Already at Home");
+                        mDrawerLayout.closeDrawer(Gravity.START);
+                        return true;
+                    case R.id.go_to_stored_news:
+                    case R.id.go_to_info:
+                    case R.id.go_to_settings:
+                    case R.id.go_to_social:
+
+                        toastOnUIThread("Under development");
+                        return true;
+                }
+
                 return false;
             }
         });
 
-        ActionBarDrawerToggle drawerToggle = new ActionBarDrawerToggle(MainActivity.this, mDrawerLayout, 0, 0) {
+        drawerToggle = new ActionBarDrawerToggle(MainActivity.this, mDrawerLayout, 0, 0) {
             @Override
             public void onDrawerOpened(View drawerView) {
                 super.onDrawerOpened(drawerView);
@@ -193,7 +209,7 @@ public class MainActivity extends AppCompatActivity implements ServiceUtils.Serv
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main_activity, menu);
+        getMenuInflater().inflate(R.menu.menu_toolbar, menu);
 
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         SearchView searchView = (SearchView) menu.findItem(R.id.menu_search).getActionView();
@@ -240,10 +256,19 @@ public class MainActivity extends AppCompatActivity implements ServiceUtils.Serv
         switch (item.getItemId()) {
             case R.id.refresh_button:
                 MainActivity.this.refreshUI();
-                break;
+                return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void toastOnUIThread(final String message) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(MainActivity.this, message, Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
     @Override

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/go_to_main"
+          android:title="Home"
+          android:icon="@drawable/ic_home_black_24dp"/>
+    <item android:id="@+id/go_to_stored_news"
+          android:title="Saved news articles"
+          android:icon="@drawable/ic_folder_shared_black_24dp"/>
+    <item android:id="@+id/go_to_info"
+          android:title="Info"
+          android:icon="@drawable/ic_info_outline_black_24dp"/>
+    <item android:id="@+id/go_to_settings"
+          android:title="Settings"
+          android:icon="@drawable/ic_settings_applications_black_24dp"/>
+    <item android:id="@+id/go_to_social"
+          android:title="Follow us"
+          android:icon="@drawable/ic_facebook"/>
+</menu>
