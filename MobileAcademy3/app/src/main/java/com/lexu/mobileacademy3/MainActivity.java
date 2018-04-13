@@ -40,7 +40,7 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements ServiceUtils.ServiceCallback, OnNavigationOccurredListener {
+public class MainActivity extends AppCompatActivity implements ServiceUtils.ServiceCallback<NewsArticle>, OnNavigationOccurredListener {
 
     private static final String TAG = MainActivity.class.getSimpleName();
     static final String ARTICLE_DATA = "ARTICLE";
@@ -95,9 +95,13 @@ public class MainActivity extends AppCompatActivity implements ServiceUtils.Serv
         setupUI();
 
         if(savedInstanceState != null && savedInstanceState.containsKey(CustomService.ARTICLES_EXTRA)) {
-            ServiceUtils.ArticlesWrapper wrapper = (ServiceUtils.ArticlesWrapper) savedInstanceState.getSerializable(CustomService.ARTICLES_EXTRA);
+            ServiceUtils.Wrapper<NewsArticle> wrapper = (ServiceUtils.Wrapper<NewsArticle>) savedInstanceState.getSerializable(CustomService.ARTICLES_EXTRA);
             if(wrapper != null) {
-                this.adapter.setItems(wrapper.articles);
+                List<NewsArticle> data = wrapper.data;
+
+                if(data != null) {
+                    this.adapter.setItems(data);
+                }
             }
             progressBarOverlay.setVisibility(View.GONE);
         } else {
@@ -116,8 +120,12 @@ public class MainActivity extends AppCompatActivity implements ServiceUtils.Serv
                         toastOnUIThread("Already at Home");
                         mDrawerLayout.closeDrawer(Gravity.START);
                         return true;
-                    case R.id.go_to_stored_news:
                     case R.id.go_to_info:
+                        Intent intent = new Intent(MainActivity.this, InfoActivity.class);
+                        startActivity(intent);
+                        mDrawerLayout.closeDrawer(Gravity.START);
+                        return true;
+                    case R.id.go_to_stored_news:
                     case R.id.go_to_settings:
                     case R.id.go_to_social:
 
@@ -200,8 +208,8 @@ public class MainActivity extends AppCompatActivity implements ServiceUtils.Serv
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-        ServiceUtils.ArticlesWrapper wrapper = new ServiceUtils.ArticlesWrapper();
-        wrapper.articles = this.adapter.getItems();
+        ServiceUtils.Wrapper wrapper = new ServiceUtils.Wrapper();
+        wrapper.data = this.adapter.getItems();
 
         outState.putSerializable(CustomService.ARTICLES_EXTRA, wrapper);
         super.onSaveInstanceState(outState);

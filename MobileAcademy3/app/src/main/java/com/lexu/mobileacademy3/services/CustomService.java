@@ -107,8 +107,8 @@ public class CustomService extends Service {
         Intent intent = new Intent();
         intent.setAction(ACTION_GENERATE_DATA);
 
-        ServiceUtils.ArticlesWrapper wrapper = new ServiceUtils.ArticlesWrapper();
-        wrapper.articles = newArticles;
+        ServiceUtils.Wrapper<NewsArticle> wrapper = new ServiceUtils.Wrapper<NewsArticle>();
+        wrapper.data = newArticles;
 
         intent.putExtra(STATUS_CODE, 1);
         intent.putExtra(ARTICLES_EXTRA, wrapper);

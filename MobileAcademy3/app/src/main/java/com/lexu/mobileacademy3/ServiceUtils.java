@@ -6,12 +6,12 @@ import java.io.Serializable;
 import java.util.List;
 
 public interface ServiceUtils {
-    class ArticlesWrapper implements Serializable {
-        public List<NewsArticle> articles = null;
+    class Wrapper<T> implements Serializable {
+        public List<T> data = null;
     }
 
-    interface ServiceCallback {
-        void onDataRetrieved(List<NewsArticle> articles);
+    interface ServiceCallback<T> {
+        void onDataRetrieved(List<T> data);
         void onErrorReceived(String msg);
     }
 
